@@ -1,0 +1,48 @@
+---
+title: "P3_Prep"
+author: "Todd Idol"
+date: "11/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(DT)
+library(caret)
+library(readr)
+library(rmarkdown)
+```
+
+```{r, data}
+
+# Read in census data
+getwd()
+ds <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demographics/county_demographics.csv")
+
+ds <- ds %>% filter(State == "NC") %>% 
+  
+  mutate(Pop_Rank = ifelse(Population.2014.Population < 50000, "< 50k",
+                           ifelse(Population.2014.Population < 200000, "51k - 199k", "> 200k")),
+         CollegeGrad_Rank = ifelse(Education.Bachelor.s.Degree.or.Higher >= 30, ">= 30%", "< 30%"),
+         Gender_Proportion = ifelse(Miscellaneous.Percent.Female >= 50, "more female", "more male"),
+         HS_Grads = (Education.High.School.or.Higher - Education.Bachelor.s.Degree.or.Higher),
+         Pop_Expanding = ifelse(Population.Population.Percent.Change > 0, "yes", "no")) %>%
+  
+  select(County, ends_with("2014.Population"), Pop_Rank, starts_with("Age"), ends_with("Percent.Change"), Pop_Expanding,
+         starts_with("Education"), CollegeGrad_Rank, HS_Grads, starts_with("Ethniciities"), ends_with("Female"), Gender_Proportion,
+         ends_with("Occupied.Units"), starts_with("Income")) %>% 
+  
+  rename("Population" = Population.2014.Population,"Pop_Change" = Population.Population.Percent.Change, "65_Up" =
+           Age.Percent.65.and.Older, "18_Down" = Age.Percent.Under.18.Years, "College_Grads" = Education.Bachelor.s.Degree.or.Higher,
+         "Percent_Female" = Miscellaneous.Percent.Female, "Home_Value" = Housing.Median.Value.of.Owner.Occupied.Units,
+         "Household_Income" = Income.Median.Houseold.Income,"Percent_Poverty" = Income.Persons.Below.Poverty.Level) %>%
+  
+  select(-c(Income.Per.Capita.Income, Age.Percent.Under.5.Years, Education.High.School.or.Higher,
+            Employment.Private.Non.farm.Employment.Percent.Change)) %>% 
+  
+  arrange(desc(Population))
+ds
+
+```
