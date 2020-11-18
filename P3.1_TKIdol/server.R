@@ -41,20 +41,33 @@ ds <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demograp
               Employment.Private.Non.farm.Employment.Percent.Change)) %>% 
     
     arrange(desc(Population))
- 
+    
 # RF Classification Train / Test set 
 ds$Pop_Expanding <- as.factor(ds$Pop_Expanding)
+
 classIndex <- createDataPartition(ds$Pop_Expanding, p = .8, list = FALSE)
 classTrain <- ds[classIndex, ]
 classTest <- ds[-classIndex, ]
 
-# RF Regression Train / Test set
+ # RF Regression Train / Test set
 regIndex <- createDataPartition(ds$Home_Value, p = .8, list = FALSE)
 regTrain <- ds[regIndex, ]
 regTest <- ds[-regIndex, ]
-
-
+    
+   
 shinyServer(function(input, output, session){
+  
+  # RF Classification Train / Test set 
+  ds$Pop_Expanding <- as.factor(ds$Pop_Expanding)
+  classIndex <- createDataPartition(ds$Pop_Expanding, p = .8, list = FALSE)
+  classTrain <- ds[classIndex, ]
+  classTest <- ds[-classIndex, ]
+  
+  # RF Regression Train / Test set
+  regIndex <- createDataPartition(ds$Home_Value, p = .8, list = FALSE)
+  regTrain <- ds[regIndex, ]
+  regTest <- ds[-regIndex, ]
+  
   
   
     tab <- reactive({
@@ -77,9 +90,9 @@ shinyServer(function(input, output, session){
       cFit <- train(Pop_Expanding ~ ., data = classTrain,
                     method = "rf", preProcess = c("center", "scale"),
                     trControl = trainControl(method = "cv",
-                    number = 10),
+                    number = as.numeric(input$folds)),
                     tuneGrid = data.frame(mtry = as.numeric(input$mtry)), 
-                    ntree=500)
+                    ntree=500, importance = TRUE)
                                          
      cFit
     })
@@ -95,9 +108,9 @@ shinyServer(function(input, output, session){
       rFit <- train(Home_Value ~ ., data = regTrain,
                     method = "rf", preProcess = c("center", "scale"),
                     trControl = trainControl(method = "cv",
-                    number = 10),
+                    number = as.numeric(input$folds)),
                     tuneGrid = data.frame(mtry = as.numeric(input$mtry)), 
-                    ntree=500)
+                    ntree=500, importance = TRUE)
                                           
       rFit
     })
@@ -108,6 +121,14 @@ shinyServer(function(input, output, session){
       r_mse <- round(rResultz[1,1], digits = 3)
       r_mse
     })
+    
+    tab2 <- reactive({
+      ds4 <- ds %>% select(input$select)
+      ds4
+    })
+    
+    
+    
     
 
     # Observe college rank checkbox and adjust slider settings if true
@@ -129,7 +150,6 @@ shinyServer(function(input, output, session){
         }
     })
     
-  
     # Output barplot to ui.R
     output$barPlot <- renderPlotly({  
         
@@ -244,7 +264,11 @@ shinyServer(function(input, output, session){
       paste("The tested Accuracy is:", cTreePred())
     })
     
-    output$rTree<- renderTable({
+    output$cModel <- renderPrint({
+      cTreeFit()$finalModel
+    })
+    
+    output$rTree <- renderTable({
       rTreeFit()$results[, 1:2]
     })
     
@@ -252,5 +276,7 @@ shinyServer(function(input, output, session){
       paste("The tested RMSE is:", rTreePred())
     })
     
- 
+    output$subset <- renderDataTable(tab2())
+    
+
 })

@@ -217,38 +217,70 @@ dashboardPage(skin = "blue",
                                    br(), 
                                    
                                    box(width=12,background="blue", selectizeInput("folds","Choose number of CV folds", 
-                                                                                  choices = c(3, 7, 10), selected = 3)),
+                                                                                  choices = c(10, 20), selected = 10)),
                                    
                           ),
                             
                           column(width=9,
                                   fluidRow(
                                      box(width=6,
-                                         tableOutput(h4("cTree")),
+                                         tableOutput("cTree"),
                                          br(),
-                                         h4("Expanding Population Classification Accuracy (Train)")
+                                         h4("Expanding Population RF Classification Accuracy (Train)")
                                      ),
                                      box(width=6,
-                                         textOutput(h4("cPred")),
+                                         textOutput("cPred"),
                                          br(),
-                                         h4("Expanding Population Random Forest Classificatio Accuracy (Prediction)"))
+                                         h4("Expanding Population RF Classificatin Accuracy (Prediction)"))
                                      ),
+                                 
+                                     box(width=6,
+                                       textOutput("cModel"),
+                                       br(),
+                                       h4("Classification Final Model")
+                                     ),
+                          
                                      box(width=6, 
-                                         tableOutput(h4("rTree")),
+                                         tableOutput("rTree"),
                                          br(),
-                                         h4("Home Value Random Forest Training RMSE")
+                                         h4("Home Value RF Regression Training RMSE")
                                      ),
                                      
                                      box(width=6, 
-                                         textOutput(h4("rPred")),
+                                         textOutput("rPred"),
                                          br(),
-                                         h4("Home Value Random Forest Prediction RMSE")
+                                         h4("Home Value RF Regression Prediction RMSE")
                                    )
-                            ),
+                              )
+                       )
+                  ),
+                  
+                  tabItem(tabName = "data",
+                          fluidRow(
+                            column(width=3,
+                                   h4("This tab enables subsetting and downloading of the NC county demographic data set."),
+                                   
+                                   h4("Available actionns are Select for all variables, Filter for categorical variables and Arrange for all
+                                      variables"),
+
+                                   br(),
+                                   
+                                   box(width=12,background="blue", selectizeInput("select","Select Variables", 
+                                                                                  choices = names(ds), multiple = TRUE,
+                                                                                  selected = "County")),
+                           ),
                             
-                          )
-                  )
+                            column(width=12,
+                                   fluidRow(
+                                     box(width=12,
+                                         dataTableOutput("subset"))
+                                        
+                        )
+                    )
                 )
+                  
+                 )
               )
            )
+)
 
