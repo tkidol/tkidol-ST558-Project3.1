@@ -22,7 +22,7 @@ ds <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demograp
     ds <- ds %>% filter(State == "NC") %>% 
     
     mutate(Pop_Rank = ifelse(Population.2014.Population < 50000, "< 50k",
-                             ifelse(Population.2014.Population < 200000, "51k - 199k", ">= 200k")),
+                             ifelse(Population.2014.Population < 200000, "50k - 199k", ">= 200k")),
            CollegeGrad_Rank = ifelse(Education.Bachelor.s.Degree.or.Higher >= 30, ">= 30%", "< 30%"),
            Gender_Proportion = ifelse(Miscellaneous.Percent.Female >= 50, "more female", "more male"),
            HS_Grads = (Education.High.School.or.Higher - Education.Bachelor.s.Degree.or.Higher),
@@ -41,7 +41,17 @@ ds <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demograp
               Employment.Private.Non.farm.Employment.Percent.Change)) %>% 
     
     arrange(desc(Population))
+ 
+# RF Classification Train / Test set 
+ds$Pop_Expanding <- as.factor(ds$Pop_Expanding)
+classIndex <- createDataPartition(ds$Pop_Expanding, p = .8, list = FALSE)
+classTrain <- ds[classIndex, ]
+classTest <- ds[-classIndex, ]
 
+# RF Regression Train / Test set
+regIndex <- createDataPartition(ds$Home_Value, p = .8, list = FALSE)
+regTrain <- ds[regIndex, ]
+regTest <- ds[-regIndex, ]
 
 
 shinyServer(function(input, output, session){
@@ -63,6 +73,43 @@ shinyServer(function(input, output, session){
         pc
     })
     
+    cTreeFit <- reactive({
+      cFit <- train(Pop_Expanding ~ ., data = classTrain,
+                    method = "rf", preProcess = c("center", "scale"),
+                    trControl = trainControl(method = "cv",
+                    number = 10),
+                    tuneGrid = data.frame(mtry = as.numeric(input$mtry)), 
+                    ntree=500)
+                                         
+     cFit
+    })
+    
+    cTreePred <- reactive({
+      cPred <- predict(cTreeFit(), newdata = classTest)
+      cResultz <- as_tibble(postResample(cPred, classTest$Pop_Expanding))
+      accuracy <- round(cResultz[1,1], digits = 3)
+      accuracy
+    })
+    
+    rTreeFit <- reactive({
+      rFit <- train(Home_Value ~ ., data = regTrain,
+                    method = "rf", preProcess = c("center", "scale"),
+                    trControl = trainControl(method = "cv",
+                    number = 10),
+                    tuneGrid = data.frame(mtry = as.numeric(input$mtry)), 
+                    ntree=500)
+                                          
+      rFit
+    })
+    
+    rTreePred <- reactive({
+      rPred <- predict(rTreeFit(), newdata = regTest)
+      rResultz <- as_tibble(postResample(rPred, regTest$Home_Value))
+      r_mse <- round(rResultz[1,1], digits = 3)
+      r_mse
+    })
+    
+
     # Observe college rank checkbox and adjust slider settings if true
     observe({
         if(input$cgr){
@@ -82,6 +129,7 @@ shinyServer(function(input, output, session){
         }
     })
     
+  
     # Output barplot to ui.R
     output$barPlot <- renderPlotly({  
         
@@ -188,6 +236,21 @@ shinyServer(function(input, output, session){
       biplot(PCs(), choices=c(2,3))
     })
     
+    output$cTree <- renderTable({
+     cTreeFit()$results[, 1:2]
+   })
     
+    output$cPred <- renderPrint({
+      paste("The tested Accuracy is:", cTreePred())
+    })
     
+    output$rTree<- renderTable({
+      rTreeFit()$results[, 1:2]
+    })
+    
+    output$rPred <- renderPrint({
+      paste("The tested RMSE is:", rTreePred())
+    })
+    
+ 
 })

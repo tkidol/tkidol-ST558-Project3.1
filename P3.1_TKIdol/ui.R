@@ -156,7 +156,7 @@ dashboardPage(skin = "blue",
                   tabItem(tabName = "pca",
                           fluidRow(
                             column(width=3,
-                                   h3("This tab will produce a principal component analysis (PCA) which is dimension reduction technique
+                                   h4("This tab will produce a principal component analysis (PCA) which is dimension reduction technique
                                           exploring relationships between variables in our data set.  PCA examines linear combinations of
                                           variables accounting for the most variability in the DS given by mathjax formula.  The high variability
                                           PC's can be good candidated for uncorrelated predictors in a linear regression model, i.e. Principal
@@ -168,9 +168,8 @@ dashboardPage(skin = "blue",
                                                                                   choices = c("Population", "65_Up", "18_Down", "College_Grads",
                                                                                               "HS_Grads", "Pop_Change", "Percent_Female",
                                                                                               "Home_Value", "Household_Income","Percent_Poverty"),
-                                                                                  options = list(maxItems=4), multiple=TRUE))
-                                   
-                                   
+                                                                                  multiple=TRUE, options = list(maxItems=4)))
+
                             ),
                             
                             column(width=9,
@@ -201,51 +200,49 @@ dashboardPage(skin = "blue",
                   tabItem(tabName = "model",
                           fluidRow(
                             column(width=3,
-                                   h3("On this tab we will use the [Caret Package](http://topepo.github.io/caret/index.html) for a Random Forest
-                                          Classification and Regression Tree analysis using a bootstrap sampling method on a training and
-                                          test dataset.  The classification Tree technique will predict whether a county's population is expanding or
-                                          shrinking based on the randomly chosen predictors.  The Regression Tree technique will predict  median
-                                          home values based on the randomly chosen predictors. Accuracy (classification) and RMSE(regression)
-                                          will be be used as model success metrics."),
+                                   h4("On this tab we will use the Caret Package for a Random Forest Classification and Regression Tree analysis using
+                                   a bootstrap sampling method on a training and test dataset.  The classification Tree technique will predict whether
+                                   a county's population is expanding or shrinking based on the randomly chosen predictors."),
                                    
-                                   h3("The user will be able to specify the following tuning parameters: *mtry* - number of randomly 
-                                           chosen prectors between 1 & 10, *ntree* - number of tree branches from 300, 500 or 700."
+                                   h4("The Regression Tree technique will predict  median home values based on the randomly chosen predictors.
+                                   Accuracy (classification) and RMSE(regression) will be be used as model success metrics."),
+                                   
+                                   h4("The user will be able to specify the following tuning parameters: *mtry* - number of randomly 
+                                      chosen prectors between 1 & 10, *ntree* - number of tree branches from 300, 500 or 700."),
                                       
-                                   ),
-                                   
                                    br(),
                                    
                                    box(width=12,background="blue", selectizeInput("mtry","Choose number of random variables", 
-                                                                                  choices = c(1:10))),
-                                   br(),
+                                                                                  choices = c(1:10), selected = 4)),
+                                   br(), 
                                    
-                                   box(width=12,background="blue", selectizeInput("ntree","Choose number of tree branches", 
-                                                                                  choices = c(300, 500, 700)))
+                                   box(width=12,background="blue", selectizeInput("folds","Choose number of CV folds", 
+                                                                                  choices = c(3, 7, 10), selected = 3)),
                                    
-                            ),
+                          ),
                             
                           column(width=9,
                                   fluidRow(
                                      box(width=6,
-                                         plotOutput("cTreeFit"),
+                                         tableOutput(h4("cTree")),
                                          br(),
-                                         h4("Random Forest Classification Tree Trainng Results")
+                                         h4("Expanding Population Classification Accuracy (Train)")
                                      ),
                                      box(width=6,
-                                         plotOutput("cTreePred"),
+                                         textOutput(h4("cPred")),
                                          br(),
-                                         h4("Biplot of PC1 & PC3 for Chosen Vars")
+                                         h4("Expanding Population Random Forest Classificatio Accuracy (Prediction)"))
                                      ),
                                      box(width=6, 
-                                         plotOutput("rTreeFit"),
+                                         tableOutput(h4("rTree")),
                                          br(),
-                                         h4("Biplot of PC2 & PC3 for Chosen Vars")
+                                         h4("Home Value Random Forest Training RMSE")
                                      ),
                                      
                                      box(width=6, 
-                                         plotOutput("rTreePred"),
+                                         textOutput(h4("rPred")),
                                          br(),
-                                         h4("Biplot of PC2 & PC3 for Chosen Vars")
+                                         h4("Home Value Random Forest Prediction RMSE")
                                    )
                             ),
                             
@@ -254,5 +251,4 @@ dashboardPage(skin = "blue",
                 )
               )
            )
-)
 
