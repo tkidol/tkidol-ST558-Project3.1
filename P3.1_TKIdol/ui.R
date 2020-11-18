@@ -32,33 +32,50 @@ dashboardPage(skin = "blue",
                             #add in latex functionality if needed
                             withMathJax(),
                             
-                            #two columns for each of the two items
+                            # Two columns for each of the two items
                             column(6,
                                    #Description of App
                                    h1("What does this app do?"),
                                    #box to contain description
                                    box(background="blue", width=12,
-                                       h4("This application shows the relationship between the prior distribution and the posterior distribution for a simple                                 Bayesian model."),
-                                       h4("This application corresponds to an example in ", span("Mathematical Statistics and Data Analysis",style = "font                                   :italic"), "section 3.5, example E, by John Rice."),
-                                   )
+                                       h3("This application uses census data gathered for 2014 from the CORGIS project filtered for North Carolina
+                                          counties allowing the user to analzye demographic data.  Per the CORGIS site", span("Information described
+                                          in the data includes the age distributions, the education levels, employment statistics, ethnicity percents,
+                                          houseold information, income, and other miscellneous statistics.",style ="font-style:italic")),
+                                        h3("The data is numeric, but some data has been tiered to create categorical variables: Gender_Propoortion
+                                          (binary), Pop_Rank (3 tiers), Population Expanding (binary), CollegeGrad_Rank (binary)")
+                                   ),
                             ),
                             
                             column(6,
                                    #How to use the app
                                    h1("How to use the app?"),
-                                   #box to contain description
+                                   # Box to contain description
                                    box(background="blue", width=12,
-                                       h4("The controls for the app are located to the left and the visualizations are available on the right."),
-                                       h4("To change the number of successes observed (for example the number of coins landing head side up), the slider on the                                top left can be used."),
+                                       h3("The application is arranged in 4 tabs (excluding About tab) with controls on the left and grpahs / tables
+                                          on the right."),
+                                       h3("The tabs are:"),
+                                       h3("Explore: Allows the user to select graphs and perform basic summary analysis."),
+                                       h3("PCA: Allows the user to selct up to 4 variables for principal components analysis and outputs the biplot
+                                          combination of PCs 1-3."),
+                                       h3("Model: A classification and regression model using the Random Forest ensemble supervised learning method.
+                                       The user can choose the number of random variables and tree branches for each model"),
+                                       h3("Data:  Allows the user to select, filter & arrange the data for exporting to CSV.")
+                                          
                                    )
                             )
                           )
                   ),
                   
-                  #actual app layout      
+                  # First tab layout
                   tabItem(tabName = "explore",
                           fluidRow(
                             column(width=3,
+                                   
+                                   # Description
+                                   h4("Choose Bar Plot Graph Type"),
+                                   
+                                   # Box containing radio button for bar plot selection
                                    box(width=12,background="blue", radioButtons("rb", "Population Rank and other Vars",
                                                                                 choices = c("Population Rank Only", 
                                                                                             "Population Rank and Population Expanding",
@@ -66,13 +83,17 @@ dashboardPage(skin = "blue",
                                                                                             "Population Rank and Gender_Proportion"))),
                                    br(),
                                    
+                                   # Description
+                                   h4("Choose Dot Plot Graph Type"),
+                                   
+                                   # Box containing radio buttn for dot plot selection
                                    box(width=12, background="blue", radioButtons("plot", "Dot Plot Variables", 
                                                                                  choices = c("Income by Population",
                                                                                              "% Female by Population",
                                                                                              "% Poverty by Population"))),
                                    
                                    box(width=12, background="blue", selectizeInput("si","Population Rank",
-                                                                                   choices = levels(as.factor(ds$Pop_Rank)))),
+                                                                                   choices = c("< 50k", "50k - 199k", ">= 200k"))),
                                    br(),
                                    
                                    box(width=12, background="blue", sliderInput("size", "Size of Points on Graph",
@@ -85,8 +106,8 @@ dashboardPage(skin = "blue",
                                    br(),
                                    
                                    # Conditional input if pop expanding is checked
-                                   box(width=12, background="blue", condition = "input.pop", 
-                                       checkboxInput("cgr","Also change transparency by % College Grads?")),
+                                   box(width=12, background="blue", conditionalPanel(condition = "input.pop",
+                                                                    checkboxInput("cgr","Also change transparency by % College Grads?"))),
                                    
                                    br(),
                                    
@@ -203,24 +224,28 @@ dashboardPage(skin = "blue",
                                    
                             ),
                             
-                            column(width=9,
-                                   fluidRow(
+                          column(width=9,
+                                  fluidRow(
                                      box(width=6,
                                          plotOutput("cTreeFit"),
                                          br(),
                                          h4("Random Forest Classification Tree Trainng Results")
                                      ),
                                      box(width=6,
-                                         plotOutput("biPlot1"),
+                                         plotOutput("cTreePred"),
                                          br(),
                                          h4("Biplot of PC1 & PC3 for Chosen Vars")
                                      ),
                                      box(width=6, 
-                                         plotOutput("biPlot2"),
+                                         plotOutput("rTreeFit"),
                                          br(),
                                          h4("Biplot of PC2 & PC3 for Chosen Vars")
-                                     )
+                                     ),
                                      
+                                     box(width=6, 
+                                         plotOutput("rTreePred"),
+                                         br(),
+                                         h4("Biplot of PC2 & PC3 for Chosen Vars")
                                    )
                             ),
                             
@@ -228,5 +253,6 @@ dashboardPage(skin = "blue",
                   )
                 )
               )
+           )
 )
 

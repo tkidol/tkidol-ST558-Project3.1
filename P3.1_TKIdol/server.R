@@ -16,12 +16,13 @@ library(DT)
 library(plotly)
 library(caret)
 
-ds <- read.csv("county_demographics.csv")
+
+ds <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demographics/county_demographics.csv")
   
-  ds <- ds %>% filter(State == "NC") %>% 
+    ds <- ds %>% filter(State == "NC") %>% 
     
     mutate(Pop_Rank = ifelse(Population.2014.Population < 50000, "< 50k",
-                             ifelse(Population.2014.Population < 200000, "51k - 199k", "> 200k")),
+                             ifelse(Population.2014.Population < 200000, "51k - 199k", ">= 200k")),
            CollegeGrad_Rank = ifelse(Education.Bachelor.s.Degree.or.Higher >= 30, ">= 30%", "< 30%"),
            Gender_Proportion = ifelse(Miscellaneous.Percent.Female >= 50, "more female", "more male"),
            HS_Grads = (Education.High.School.or.Higher - Education.Bachelor.s.Degree.or.Higher),
@@ -40,12 +41,12 @@ ds <- read.csv("county_demographics.csv")
               Employment.Private.Non.farm.Employment.Percent.Change)) %>% 
     
     arrange(desc(Population))
-  
+
 
 
 shinyServer(function(input, output, session){
   
-      
+  
     tab <- reactive({
         ds1 <- ds %>% filter(Pop_Rank == input$si)
         ds1
@@ -97,7 +98,7 @@ shinyServer(function(input, output, session){
             
             # Plot for 3rd radio button option
         }else if(input$rb == "Population Rank and Population Expanding"){
-            g <- ggplot(data = f(), aes(x = Pop_Rank)) + geom_bar(aes(fill = Pop_Expanding), position = "dodge") +
+            g <- ggplot(data = ds, aes(x = Pop_Rank)) + geom_bar(aes(fill = Pop_Expanding), position = "dodge") +
                 scale_fill_discrete(name = "Population Expanding", labels = c("No", "Yes"))
             g <- ggplotly(g)
             
@@ -111,13 +112,10 @@ shinyServer(function(input, output, session){
     
     output$incomePlot <- renderPlotly({
         
-        # Get filtered data
-        newData <- tab()
-        
-        if(input$plot == "Income by Population"){
+      if(input$plot == "Income by Population"){
             
             # Create base aesthetic
-            g <- ggplot(newData, aes(x = Population, y = Household_Income))
+            g <- ggplot(tab(), aes(x = Population, y = Household_Income))
             
             # Scatter plots by vore type based on checkbox for conservation (color)
             # and transparency (rem)
@@ -135,7 +133,7 @@ shinyServer(function(input, output, session){
             
         }else if(input$plot == "% Female by Population"){
             # Create base aesthetic
-            g <- ggplot(newData, aes(x = Population, y = Percent_Female))
+            g <- ggplot(tab(), aes(x = Population, y = Percent_Female))
             
             # Scatter plots by vore type based on checkbox for conservation (color)
             # and transparency (rem)
@@ -153,7 +151,7 @@ shinyServer(function(input, output, session){
             
         }else{
             # Create base aesthetic
-            g <- ggplot(newData, aes(x = Population, y = Percent_Poverty))
+            g <- ggplot(tab(), aes(x = Population, y = Percent_Poverty))
             
             # Scatter plots by vore type based on checkbox for conservation (color)
             # and transparency (rem)
@@ -177,5 +175,19 @@ shinyServer(function(input, output, session){
     output$summ <- renderPrint(summary(tab1()))
     
     output$table <- renderDataTable(ds)
+    
+    output$biPlot <- renderPlot({
+      biplot(PCs(), choices=c(1,2))
+    })
+    
+    output$biPlot1 <- renderPlot({
+      biplot(PCs(), choices=c(1,3))
+    })
+    
+    output$biPlot2 <- renderPlot({
+      biplot(PCs(), choices=c(2,3))
+    })
+    
+    
     
 })

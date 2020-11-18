@@ -18,7 +18,6 @@ library(rmarkdown)
 ```{r, data}
 
 # Read in census data
-getwd()
 ds <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demographics/county_demographics.csv")
 
 ds <- ds %>% filter(State == "NC") %>% 
