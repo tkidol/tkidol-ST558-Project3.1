@@ -315,11 +315,32 @@ dashboardPage(skin = "blue",
                                    # Input selections for variables
                                    box(width=12,background="blue", selectizeInput("select","Select Variables", 
                                                                                   choices = names(ds), multiple = TRUE,
-                                                                                  selected = "County")),
+                                                                                  selected = "Population",)),
+                                   
+                                   # Input selections for filtering
+                                   box(width=12, background="blue", selectizeInput("cond1", "Pop Rank Variables",
+                                                                                   choices = c("< 50k", "50k - 199k", ">= 200k"),
+                                                                                                selected = "< 50k", multiple = TRUE)),
+                  
+                                   #Filter conditions to match
+                                   box(width=12, background="blue", selectizeInput("cond2", "Pop Expanding Options",
+                                                                                   choices = c("no", "yes"), selected = "no",
+                                                                                   multiple = TRUE)),
+                                   
+                                   # Filter conditions to match
+                                   box(width=12, background="blue", selectizeInput("cond3", "College Grad Rank Options",
+                                                                                   choices = c(">= 30%", "< 30%"), selected= ">= 30%",
+                                                                                   multiple = TRUE)),
+                                   
+                                   #Filter conditions to match
+                                   box(width=12, background="blue", selectizeInput("cond4", "Gender Ratio Options",
+                                                                                   choices = c("more female", "more male"), 
+                                                                                   selected = "more female", multiple = TRUE))
+                                   
                            ),
                             
                             # Subsetted data outpout
-                            column(width=12,
+                            column(width=6,
                                    fluidRow(
                                      box(width=12,
                                          dataTableOutput("subset")),

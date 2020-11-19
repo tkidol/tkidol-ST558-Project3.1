@@ -127,7 +127,8 @@ shinyServer(function(input, output, session){
     
     # Subsetted data for export
     tab2 <- reactive({
-      ds4 <- ds %>% select(input$select)
+      ds4 <- ds %>% filter(Pop_Rank == input$cond1, Pop_Expanding == input$cond2, CollegeGrad_Rank == input$cond3,
+                           Gender_Proportion == input$cond4) %>% select(input$select)
       ds4
     })
     
