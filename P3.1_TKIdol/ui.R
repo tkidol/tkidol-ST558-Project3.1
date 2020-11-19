@@ -318,24 +318,22 @@ dashboardPage(skin = "blue",
                                                                                   selected = "Population",)),
                                    
                                    # Input selections for filtering
-                                   box(width=12, background="blue", selectizeInput("cond1", "Pop Rank Variables",
+                                   box(width=12, background="blue", selectizeInput("cond1", "Pop Rank Options",
                                                                                    choices = c("< 50k", "50k - 199k", ">= 200k"),
-                                                                                                selected = "< 50k", multiple = TRUE)),
+                                                                                                selected = "< 50k")),
                   
                                    #Filter conditions to match
                                    box(width=12, background="blue", selectizeInput("cond2", "Pop Expanding Options",
-                                                                                   choices = c("no", "yes"), selected = "no",
-                                                                                   multiple = TRUE)),
+                                                                                   choices = c("no", "yes"), selected = "no")),
                                    
                                    # Filter conditions to match
                                    box(width=12, background="blue", selectizeInput("cond3", "College Grad Rank Options",
-                                                                                   choices = c(">= 30%", "< 30%"), selected= ">= 30%",
-                                                                                   multiple = TRUE)),
+                                                                                   choices = c(">= 30%", "< 30%"), selected= ">= 30%")),
                                    
                                    #Filter conditions to match
                                    box(width=12, background="blue", selectizeInput("cond4", "Gender Ratio Options",
                                                                                    choices = c("more female", "more male"), 
-                                                                                   selected = "more female", multiple = TRUE))
+                                                                                   selected = "more female"))
                                    
                            ),
                             
