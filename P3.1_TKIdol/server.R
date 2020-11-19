@@ -7,14 +7,13 @@
 #
 # Required packages
 library(dplyr)
-library(readr)
 library(ggplot2)
 library(shiny)
 library(shinydashboard)
-library(shinyWidgets)
 library(DT)
 library(plotly)
 library(caret)
+
 
 
 ds_raw <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demographics/county_demographics.csv")

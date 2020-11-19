@@ -12,6 +12,7 @@ library(plotly)
 library(DT)
 library(caret)
 
+
 # Define dashboard for user interaction
 dashboardPage(skin = "blue",
               dashboardHeader(title = "Post-Secondary Employment Outcomes", titleWidth = 1000),
@@ -57,7 +58,7 @@ dashboardPage(skin = "blue",
                                        h3("The tabs are:"),
                                        h3("Explore: Allows the user to select graphs and perform basic summary analysis."),
                                        h3("PCA: Allows the user to selct up to 4 variables for principal components analysis and outputs the biplot
-                                          combination of PCs 1-3."),
+                                          combination of PCs 1-3 and Scree plot.  Subject to"),
                                        h3("Model: A classification and regression model using the Random Forest ensemble supervised learning method.
                                        The user can choose the number of random variables and tree branches for each model"),
                                        h3("Data:  Allows the user to select, filter & arrange the data for exporting to CSV.")
@@ -170,21 +171,23 @@ dashboardPage(skin = "blue",
                   tabItem(tabName = "pca",
                           fluidRow(
                             column(width=3,
-                                   h4("This tab will produce a principal component analysis (PCA) which is dimension reduction technique
-                                          exploring relationships between variables in our data set.  PCA examines linear combinations of
-                                          variables accounting for the most variability in the DS given by mathjax formula.  The high variability
-                                          PC's can be good candidated for uncorrelated predictors in a linear regression model, i.e. Principal
-                                          Component Regression (PCR)"),
+                                   h4("This tab will produces a principal component analysis (PCA) which is dimension reduction technique
+                                       exploring relationships between variables in our data set.  PCA examines linear combinations of
+                                       variables accounting for the most variability in the DS given by mathjax formula."),
+                                  h4("The high variability PC's can be good candidated for uncorrelated predictors in a linear regression model, i.e.
+                                      Principal Component Regression (PCR)"),
+                                  h4("Each PC has an associated Eigenvalue, denoted by \\(\\Phi\\), representing the amount of variance attributable
+                                     to that PC.  The first PC has the largest \\(\\Phi\\) value."),
                                    
                                    br(),
                                    
-                                   box(width=12,background="blue", selectizeInput("pc","Choose 4 variables for PCA", 
+                                   box(width=12,background="blue", selectizeInput("pc","Choose up to 5 variables for PCA", 
                                                                                   choices = c("Population", "65_Up", "18_Down", "College_Grads",
                                                                                               "HS_Grads", "Pop_Change", "Percent_Female",
                                                                                               "Home_Value", "Household_Income","Percent_Poverty"),
-                                                                                  multiple=TRUE, options = list(maxItems=4)))
-
-                            ),
+                                                                                  multiple=TRUE, options = list(maxItems=5)))
+                                  
+                              ),
                             
                             column(width=9,
                                    fluidRow(
@@ -237,6 +240,9 @@ dashboardPage(skin = "blue",
                                    
                                    box(width=12,background="blue", selectizeInput("folds","Choose number of CV folds", 
                                                                                   choices = c(10, 20), selected = 10)),
+                                   br(),
+                                   
+                                   box(width=12,background="blue", checkboxInput("modrb", "Include classification final model info?"))
                                    
                           ),
                             
@@ -253,8 +259,8 @@ dashboardPage(skin = "blue",
                                          h4("Expanding Population RF Classificatin Accuracy (Prediction)"))
                                      ),
                                  
-                                     box(width=6,
-                                       textOutput("cModel"),
+                                     box(width=6, conditionalPanel(condition = "input.modrb",
+                                       textOutput("cModel")),
                                        br(),
                                        h4("Classification Final Model")
                                      ),

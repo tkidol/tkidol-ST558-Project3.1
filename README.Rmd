@@ -1,7 +1,7 @@
 ---
 title: "README"
 author: "Todd Idol"
-date: "11/03/2020"
+date: "11/18/2020"
 output: 
    github_document:
      toc: true
@@ -16,7 +16,7 @@ Project 3
 
 # Project Repo
 
-Find the project repo [here](https://github.com/tkidol/ST558-Project3).
+Find the project repo [here](https://github.com/tkidol/tkidol-ST558-Project3.1).
 
 
 # Packages

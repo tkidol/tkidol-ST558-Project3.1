@@ -1,7 +1,7 @@
 README
 ================
 Todd Idol
-11/03/2020
+11/18/2020
 
 -   [Description](#description)
 -   [Project Repo](#project-repo)
@@ -21,7 +21,8 @@ Project 3
 Project Repo
 ============
 
-Find the project repo [here](https://github.com/tkidol/ST558-Project3).
+Find the project repo
+[here](https://github.com/tkidol/tkidol-ST558-Project3.1).
 
 Packages
 ========
