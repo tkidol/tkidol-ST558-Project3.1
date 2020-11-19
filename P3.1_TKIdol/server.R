@@ -17,9 +17,9 @@ library(plotly)
 library(caret)
 
 
-ds <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demographics/county_demographics.csv")
+ds_raw <- read.csv("https://corgis-edu.github.io/corgis/datasets/csv/county_demographics/county_demographics.csv")
   
-    ds <- ds %>% filter(State == "NC") %>% 
+    ds <- ds_raw %>% filter(State == "NC") %>% 
     
     mutate(Pop_Rank = ifelse(Population.2014.Population < 50000, "< 50k",
                              ifelse(Population.2014.Population < 200000, "50k - 199k", ">= 200k")),
@@ -86,6 +86,8 @@ shinyServer(function(input, output, session){
         pc
     })
     
+    
+    
     cTreeFit <- reactive({
       cFit <- train(Pop_Expanding ~ ., data = classTrain,
                     method = "rf", preProcess = c("center", "scale"),
@@ -127,10 +129,7 @@ shinyServer(function(input, output, session){
       ds4
     })
     
-    
-    
-    
-
+  
     # Observe college rank checkbox and adjust slider settings if true
     observe({
         if(input$cgr){
@@ -150,6 +149,7 @@ shinyServer(function(input, output, session){
         }
     })
     
+
     # Output barplot to ui.R
     output$barPlot <- renderPlotly({  
         
@@ -177,7 +177,18 @@ shinyServer(function(input, output, session){
         }
     })
     
-    
+    output$dlbar <- downloadHandler(
+      filename = function(){
+        paste("county-barplot", "png", sep = ".")
+        
+      },
+      content = function(file){
+        png(file)
+        ggplotly(g)
+        dev.off()
+     }
+    )
+
     output$incomePlot <- renderPlotly({
         
       if(input$plot == "Income by Population"){
@@ -238,11 +249,23 @@ shinyServer(function(input, output, session){
         
     })
     
+    output$dldot <- downloadHandler(
+      filename = function(){
+        paste("county-dotplot", "png", sep = ".")
+      },
+      content = function(file){
+        png(file)
+        incomePlot()
+        dev.off()
+      }
+    )
     
+
     # 5 num summary + mean for quant vars
     output$summ <- renderPrint(summary(tab1()))
     
     output$table <- renderDataTable(ds)
+    
     
     output$biPlot <- renderPlot({
       biplot(PCs(), choices=c(1,2))
@@ -254,6 +277,10 @@ shinyServer(function(input, output, session){
     
     output$biPlot2 <- renderPlot({
       biplot(PCs(), choices=c(2,3))
+    })
+    
+    output$scree <- renderPlot({
+      screeplot(PCs(), type = "lines")
     })
     
     output$cTree <- renderTable({
@@ -275,8 +302,16 @@ shinyServer(function(input, output, session){
     output$rPred <- renderPrint({
       paste("The tested RMSE is:", rTreePred())
     })
-    
+   
     output$subset <- renderDataTable(tab2())
     
+    output$dldata <- downloadHandler(
+      filename = function(){
+        paste("county-data", "csv", sep = ".")
+      },
+      content = function(file){
+        write.csv(tab2(), file)
+      }
+    )
 
 })

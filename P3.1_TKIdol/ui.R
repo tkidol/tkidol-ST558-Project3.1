@@ -81,12 +81,15 @@ dashboardPage(skin = "blue",
                                                                                             "Population Rank and Population Expanding",
                                                                                             "Population Rank and College Grad Rank",
                                                                                             "Population Rank and Gender_Proportion"))),
+                                
+                                  
                                    br(),
+                                   
                                    
                                    # Description
                                    h4("Choose Dot Plot Graph Type"),
                                    
-                                   # Box containing radio buttn for dot plot selection
+                                   # Box containing radio button for dot plot selection
                                    box(width=12, background="blue", radioButtons("plot", "Dot Plot Variables", 
                                                                                  choices = c("Income by Population",
                                                                                              "% Female by Population",
@@ -116,6 +119,7 @@ dashboardPage(skin = "blue",
                                                                                               "HS_Grads", "Pop_Change", "Percent_Female",
                                                                                               "Home_Value", "Household_Income",
                                                                                               "Percent_Poverty"))),
+                                   br(),
                                    
                             ),
                             
@@ -126,11 +130,21 @@ dashboardPage(skin = "blue",
                                          br(),
                                          h4("Population Rank")
                                      ),
+                                     
+                                     br(),
+                                     
+                                     downloadButton("dlbar", "Download Bar"),
+                                   
                                      box(width=6, 
                                          plotlyOutput("incomePlot"),
                                          br(),
                                          h4("Household Income by Population")
                                      ),
+                                   
+                                    br(),
+                                    
+                                    downloadButton("dldot", "Download Scatter"),
+                            
                                      # 5 num summ + mean for chosen var's
                                      box(width=6, 
                                          verbatimTextOutput("summ"),
@@ -188,6 +202,11 @@ dashboardPage(skin = "blue",
                                          plotOutput("biPlot2"),
                                          br(),
                                          h4("Biplot of PC2 & PC3 for Chosen Vars")
+                                     ),
+                                     box(width=6, 
+                                         plotOutput("scree"),
+                                         br(),
+                                         h4("Scree Plot")
                                      )
                                      
                                    )
@@ -273,7 +292,12 @@ dashboardPage(skin = "blue",
                             column(width=12,
                                    fluidRow(
                                      box(width=12,
-                                         dataTableOutput("subset"))
+                                         dataTableOutput("subset")),
+                                     
+                                     br(),
+                                     downloadButton("dldata", "Download Data"),
+                                     
+                                     
                                         
                         )
                     )
@@ -282,5 +306,7 @@ dashboardPage(skin = "blue",
                  )
               )
            )
-)
+  )
+  
+
 
